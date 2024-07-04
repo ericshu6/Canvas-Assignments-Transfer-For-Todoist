@@ -8,6 +8,7 @@ from requests.auth import HTTPDigestAuth
 from datetime import datetime, timezone, timedelta
 import time
 from random import randint
+from sys import argv
 
 # Load configuration files and creates a list of course_ids
 config = {}
@@ -142,11 +143,12 @@ def select_courses():
             exit()
         # Note that only courses in "Active" state are returned
         if config["courses"]:
-            use_previous_input = input(
-                "You have previously selected courses. Would you like to use the courses selected last time? (y/n) "
-            )
+            # use_previous_input = input(
+            #     "You have previously selected courses. Would you like to use the courses selected last time? (y/n) "
+            # )
             print("")
-            if use_previous_input == "y" or use_previous_input == "Y":
+            # if use_previous_input == "y" or use_previous_input == "Y":
+            if argv[1] != "":
                 course_ids.extend(
                     list(map(lambda course_id: int(course_id), config["courses"]))
                 )
@@ -268,7 +270,7 @@ def transfer_assignments_to_todoist():
         for task in todoist_tasks:
             # Check if assignment is already added to Todoist with same name and within the same Project
             if (
-                task.content == f"[{assignment['name']}]({assignment['html_url']}) Due"
+                task.content == f"[{assignment['name']}]({assignment['html_url']})"
                 and task.project_id == project_id
             ):
                 is_added = True
@@ -388,8 +390,7 @@ def add_new_task(assignment, project_id):
             + assignment["name"]
             + "]("
             + assignment["html_url"]
-            + ")"
-            + " Due",
+            + ")",
             project_id=project_id,
             due_datetime=assignment["due_at"],
             labels=config["todoist_task_labels"],
